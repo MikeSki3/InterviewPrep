@@ -30,6 +30,7 @@ public class RedBlackTree {
 		return currNode;
 	}
 
+	//TODO Will need to test this shtuff pretty hard
 	private Node rebalance(Node currNode, int data) {
 		Node child = (currNode.left != null && currNode.left.data == data) ? currNode.left : currNode.right;
 		Node sibling;
@@ -44,10 +45,16 @@ public class RedBlackTree {
 					return rotateRight(currNode.parent);
 				} else if(currNode.data > currNode.parent.data && child.data > currNode.data){
 					return rotateLeft(currNode.parent);
+				} else if(currNode.data < currNode.parent.data && child.data > currNode.data){
+					currNode.parent.left = rotateLeft(currNode);
+					return rotateRight(currNode.parent);
+				} else if(currNode.data > currNode.parent.data && child.data < currNode.data){
+					currNode.parent.right = rotateRight(currNode);
+					return rotateLeft(currNode.parent);
 				}
 			}
 		} 
-		return null;
+		return currNode;
 	}
 
 	private Node rotateLeft(Node oldRoot) {
