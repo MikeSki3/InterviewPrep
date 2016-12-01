@@ -1,59 +1,109 @@
 package tutes.util.ds;
 
 public class AVLTree {
-
 	Node root;
 
-	public AVLTree(int root) {
-		this.root = new Node(root);
+	public AVLTree(int initData) {
+		root = new Node(initData);
 	}
 
-	public Node insert(int newVal) {
-		Node newNode = new Node(newVal);
-		return insert(root, newNode);
+	public void traverse() {
+		traverse(root);
+		System.out.println();
 	}
 
-	public Node insert(Node currNode, Node newNode) {
-		if (currNode.data > newNode.data) {
-			if (currNode.left != null)
-				currNode = insert(currNode.left, newNode);
-			else
-				currNode.left = newNode;
-		} else if (currNode.data < newNode.data) {
-			if (currNode.right != null)
-				currNode = insert(currNode.right, newNode);
-			else
-				currNode.right = newNode;
+	private void traverse(Node currNode) {
+		if (currNode.left != null) {
+			traverse(currNode.left);
 		}
-		currNode.height += getMaxHeight(currNode.left, currNode.right);
-
-		return newNode;
+		System.out.print(currNode.data + " ");
+		if (currNode.right != null) {
+			traverse(currNode.right);
+		}
 	}
 
-	private int getMaxHeight(Node left, Node right) {
-		if(left != null && right != null)
-			return Math.max(left.height, right.height);
-		else if(left != null)
-			return left.height;
-		else if(right != null)
-			return right.height;
-		else
-			return 1;
+	public void insert(int data) {
+		root = insert(root, data);
+	}
+
+	private Node insert(Node currNode, int data) {
+		if (currNode == null)
+			return new Node(data);
+		if (currNode.data > data) {
+			currNode.left = insert(currNode.left, data);
+		} else if (currNode.data < data) {
+			currNode.right = insert(currNode.right, data);
+		} else {
+			return currNode;
+		}
+		currNode.height = getNewHeight(currNode);
+		currNode = rebalance(currNode, data);
+		return currNode;
+	}
+
+	private Node rebalance(Node currNode, int data) {
+		int balance = getBalance(currNode);
+		if (balance < -1 && currNode.right.data < data) {
+			return rotateLeft(currNode);
+		} else if (balance > 1 && currNode.left.data > data) {
+			return rotateRight(currNode);
+		} else if (balance < -1 && currNode.right.data > data) {
+			currNode.right = rotateRight(currNode.right);
+			return rotateLeft(currNode);
+		} else if (balance > 1 && currNode.left.data < data) {
+			currNode.left = rotateLeft(currNode.left);
+			return rotateRight(currNode);
+		}
+		return currNode;
+	}
+
+	private int getBalance(Node currNode) {
+		int leftH = (currNode.left == null) ? 0 : currNode.left.height;
+		int rightH = (currNode.right == null) ? 0 : currNode.right.height;
+		return leftH - rightH;
+	}
+
+	private Node rotateLeft(Node oldRoot) {
+		Node newRoot = oldRoot.right;
+		Node newChildRight = newRoot.left;
+		oldRoot.right = newChildRight;
+		newRoot.left = oldRoot;
+		oldRoot.height = getNewHeight(oldRoot);
+		newRoot.height = getNewHeight(newRoot);
+		return newRoot;
+	}
+
+	private Node rotateRight(Node oldRoot) {
+		Node newRoot = oldRoot.left;
+		Node newChildLeft = newRoot.right;
+		oldRoot.left = newChildLeft;
+		newRoot.right = oldRoot;
+		oldRoot.height = getNewHeight(oldRoot);
+		newRoot.height = getNewHeight(newRoot);
+		return newRoot;
+	}
+
+	private int getNewHeight(Node currNode) {
+		return Math.max(((currNode.left == null) ? 0 : currNode.left.height),
+				((currNode.right == null) ? 0 : currNode.right.height)) + 1;
 	}
 
 	class Node {
-		int data;
 		int height;
+		int data;
 		Node left;
 		Node right;
 
-		public Node(int d) {
-			data = d;
-			height = 1;
+		public Node(int data) {
+			this.data = data;
+			this.height = 1;
 		}
 
-		public boolean hasChildren() {
-			return left != null || right != null;
+		@Override
+		public String toString() {
+			// return "Node [height=" + height + ", data=" + data + "]";
+			String result = "[data=" + data + ", left=" + left + ", right=" + right + "]";
+			return result;
 		}
 	}
 }

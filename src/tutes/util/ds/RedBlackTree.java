@@ -8,19 +8,35 @@ public class RedBlackTree {
 		root = new Node(data, type.BLACK);
 	}
 
-	public void insert(int data) {
-		root = insert(root, data);
+	public void traverse() {
+		traverse(root);
+		System.out.println();
 	}
 
-	private Node insert(Node currNode, int data) {
-		if (currNode == null)
-			return new Node(data);
+	private void traverse(Node currNode) {
+		if (currNode.left != null)
+			traverse(currNode.left);
+		System.out.print(currNode.data + " ");
+		if (currNode.right != null)
+			traverse(currNode.right);
+	}
+
+	public void insert(int data) {
+		root = insert(null, root, data);
+	}
+
+	private Node insert(Node parent, Node currNode, int data) {
+		if (currNode == null) {
+			currNode = new Node(data);
+			currNode.parent = parent;
+			return currNode;
+		}
 		if (currNode.data > data) {
-			currNode.left = insert(currNode.left, data);
-			currNode.left.parent = currNode;
+			currNode.left = insert(currNode, currNode.left, data);
+			// currNode.left.parent = currNode;
 		} else if (currNode.data < data) {
-			currNode.right = insert(currNode.right, data);
-			currNode.right.parent = currNode;
+			currNode.right = insert(currNode, currNode.right, data);
+			// currNode.right.parent = currNode;
 		} else {
 			return currNode;
 		}
@@ -30,42 +46,85 @@ public class RedBlackTree {
 		return currNode;
 	}
 
-	//TODO Will need to test this shtuff pretty hard
-	private Node rebalance(Node currNode, int data) {
-		Node child = (currNode.left != null && currNode.left.data == data) ? currNode.left : currNode.right;
-		Node sibling;
-		if(breaksRedProp(currNode, child)){
-			sibling = getSibling(currNode);
-			if(sibling != null && sibling.color == type.RED){
-				sibling.color = type.BLACK;
-				currNode.color = type.BLACK;
-				swapColorsUpTree(currNode.parent);
-			} else {
-				if(currNode.data < currNode.parent.data && child.data < currNode.data){
-					return rotateRight(currNode.parent);
-				} else if(currNode.data > currNode.parent.data && child.data > currNode.data){
-					return rotateLeft(currNode.parent);
-				} else if(currNode.data < currNode.parent.data && child.data > currNode.data){
-					currNode.parent.left = rotateLeft(currNode);
-					return rotateRight(currNode.parent);
-				} else if(currNode.data > currNode.parent.data && child.data < currNode.data){
-					currNode.parent.right = rotateRight(currNode);
-					return rotateLeft(currNode.parent);
+	private Node rebalance(Node gp, int data) {
+		Node parent = (gp.data < data) ? gp.right : gp.left;
+		Node sibling = (gp.data < data) ? gp.left : gp.right;
+		Node child = (parent.left != null && parent.left.data == data) ? parent.left : parent.right;
+		if (parent != null && child != null) {
+			if (breaksRedProp(parent, child)) {
+				if (sibling != null && sibling.color == type.RED) {
+					sibling.color = type.BLACK;
+					parent.color = type.BLACK;
+					if(gp.parent == null)
+						gp.color = type.BLACK;
+					else
+						gp.color = (gp.color == type.BLACK) ? type.RED : type.BLACK;
+				} else {
+					if(parent.data < gp.data && child.data < parent.data){
+						return recolor(rotateRight(gp));
+					} else if(parent.data > gp.data && child.data > parent.data){
+						return recolor(rotateLeft(gp));
+					} else if(parent.data < gp.data && child.data > parent.data){
+						gp.left = rotateLeft(parent);
+						return recolor(rotateRight(gp));
+					} else if(parent.data > gp.data && child.data < parent.data){
+						gp.right = rotateRight(parent);
+						return recolor(rotateLeft(gp));
+					}
 				}
 			}
-		} 
-		return currNode;
+		}
+
+		return gp;
 	}
+
+	private Node recolor(Node parent) {
+		parent.color = type.BLACK;
+		if(parent.left != null)
+			parent.left.color = type.RED;
+		if(parent.right != null)
+			parent.right.color = type.RED;
+		return parent;
+	}
+
+	// private Node rebalance(Node currNode, int data) {
+	// Node child = (currNode.left != null && currNode.left.data == data) ?
+	// currNode.left : currNode.right;
+	// Node sibling;
+	// if (breaksRedProp(currNode, child)) {
+	// sibling = getSibling(currNode);
+	// if (sibling != null && sibling.color == type.RED) {
+	// sibling.color = type.BLACK;
+	// currNode.color = type.BLACK;
+	// swapColorsUpTree(currNode.parent);
+	// } else {
+	// if (currNode.data < currNode.parent.data && child.data < currNode.data) {
+	// return rotateRight(currNode.parent);
+	// } else if (currNode.data > currNode.parent.data && child.data >
+	// currNode.data) {
+	// return rotateLeft(currNode.parent);
+	// } else if (currNode.data < currNode.parent.data && child.data >
+	// currNode.data) {
+	// currNode.parent.left = rotateLeft(currNode);
+	// return rotateRight(currNode.parent);
+	// } else if (currNode.data > currNode.parent.data && child.data <
+	// currNode.data) {
+	// currNode.parent.right = rotateRight(currNode);
+	// return rotateLeft(currNode.parent);
+	// }
+	// }
+	// }
+	// return currNode;
+	// }
 
 	private Node rotateLeft(Node oldRoot) {
 		Node newRoot = oldRoot.right;
 		Node newChildRight = newRoot.left;
 		oldRoot.right = newChildRight;
 		newRoot.parent = oldRoot.parent;
+		newRoot.left = oldRoot;
 		oldRoot.parent = newRoot;
-		newRoot.color = type.BLACK;
-		oldRoot.color = type.RED;
-		
+
 		return newRoot;
 	}
 
@@ -74,10 +133,9 @@ public class RedBlackTree {
 		Node newChildLeft = newRoot.right;
 		oldRoot.left = newChildLeft;
 		newRoot.parent = oldRoot.parent;
+		newRoot.right = oldRoot;
 		oldRoot.parent = newRoot;
-		newRoot.color = type.BLACK;
-		oldRoot.color = type.RED;
-		
+
 		return newRoot;
 	}
 
@@ -96,6 +154,10 @@ public class RedBlackTree {
 
 	private boolean breaksRedProp(Node currNode, Node leftChild) {
 		return leftChild != null && leftChild.color == type.RED && currNode != null && currNode.color == type.RED;
+	}
+	
+	public Node getRoot() {
+		return root;
 	}
 
 	class Node {
@@ -120,6 +182,13 @@ public class RedBlackTree {
 			this.data = data;
 			this.color = color;
 		}
+
+		@Override
+		public String toString() {
+			return "[data=" + data + ", color=" + color + ", parent=" + (parent != null ? parent.data : null)
+					+ ", left=" + left + ", right=" + right + "]";
+		}
+
 	}
 
 	private enum type {
