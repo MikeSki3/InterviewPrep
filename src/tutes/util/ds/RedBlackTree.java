@@ -87,36 +87,6 @@ public class RedBlackTree {
 		return parent;
 	}
 
-	// private Node rebalance(Node currNode, int data) {
-	// Node child = (currNode.left != null && currNode.left.data == data) ?
-	// currNode.left : currNode.right;
-	// Node sibling;
-	// if (breaksRedProp(currNode, child)) {
-	// sibling = getSibling(currNode);
-	// if (sibling != null && sibling.color == type.RED) {
-	// sibling.color = type.BLACK;
-	// currNode.color = type.BLACK;
-	// swapColorsUpTree(currNode.parent);
-	// } else {
-	// if (currNode.data < currNode.parent.data && child.data < currNode.data) {
-	// return rotateRight(currNode.parent);
-	// } else if (currNode.data > currNode.parent.data && child.data >
-	// currNode.data) {
-	// return rotateLeft(currNode.parent);
-	// } else if (currNode.data < currNode.parent.data && child.data >
-	// currNode.data) {
-	// currNode.parent.left = rotateLeft(currNode);
-	// return rotateRight(currNode.parent);
-	// } else if (currNode.data > currNode.parent.data && child.data <
-	// currNode.data) {
-	// currNode.parent.right = rotateRight(currNode);
-	// return rotateLeft(currNode.parent);
-	// }
-	// }
-	// }
-	// return currNode;
-	// }
-
 	private Node rotateLeft(Node oldRoot) {
 		Node newRoot = oldRoot.right;
 		Node newChildRight = newRoot.left;
