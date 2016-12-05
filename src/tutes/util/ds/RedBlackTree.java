@@ -21,6 +21,165 @@ public class RedBlackTree {
 			traverse(currNode.right);
 	}
 
+	public Node find(int target) {
+		return find(root, target);
+	}
+
+	private Node find(Node curr, int target) {
+		if (curr.data == target)
+			return curr;
+		else if (curr.data > target && curr.left != null)
+			return find(curr.left, target);
+		else if (curr.data < target && curr.right != null)
+			return find(curr.right, target);
+		return null;
+	}
+
+	public void delete(int data) {
+		delete(find(data));
+	}
+
+	private void delete(Node currNode) {
+		if (currNode.left != null && currNode.right != null) {
+			Node min = findMin(currNode.right);
+			currNode.data = min.data;
+			delete(min);
+		} else {
+			Node parent = currNode.parent;
+			Node child = (currNode.left != null) ? currNode.left : currNode.right;
+			assignParentChild(parent, currNode, child);
+			rebalanceDelete(currNode);
+		}
+	}
+	
+	private void rebalanceDelete(Node deleted){
+		if(deleted.parent == null){
+			root.color = type.BLACK;
+			return;
+		}
+		Node parent = deleted.parent;
+		Node sibling = getSibling(deleted);
+		Node LSibling = sibling.left;
+		Node RSibling = sibling.right;
+		Node gp;
+		if((LSibling == null || LSibling.color == type.BLACK) && (RSibling == null || RSibling.color == type.BLACK) && (sibling != null && sibling.color == type.RED) && parent.color == type.BLACK){
+			gp = parent.parent;
+			boolean left = deleted.data < parent.data; 
+			Node rotated;
+			if(left){
+				 rotated = rotateLeft(parent);
+			} else {
+				rotated = rotateRight(parent);
+			}
+			if(gp == null)
+				root = rotated;
+			else {
+				if(left)
+					gp.left = rotated;
+				else
+					gp.right = rotated;
+			}
+			sibling.color = type.BLACK;
+			parent.color = type.RED;
+			sibling = getSibling(deleted);
+		}
+		if(parent.color == type.BLACK && (sibling != null && sibling.color == type.BLACK) && (LSibling == null || LSibling.color == type.BLACK) && (RSibling == null || RSibling.color == type.BLACK)){
+			sibling.color = type.RED;
+			rebalanceDelete(parent);
+		}
+		if(parent.color == type.RED && (sibling != null && sibling.color == type.BLACK) && (LSibling == null || LSibling.color == type.BLACK) && (RSibling == null || RSibling.color == type.BLACK)) {
+			parent.color = type.BLACK;
+			sibling.color = type.RED;
+			return;
+		}
+		if((sibling != null && sibling.color == type.BLACK) && (LSibling != null && LSibling.color == type.RED) && (RSibling != null && RSibling.color == type.BLACK)) {
+			sibling = rotateRight(sibling);
+		}
+		if((sibling != null && sibling.color == type.BLACK) && (RSibling != null && RSibling.color == type.RED)){
+			gp = parent.parent;
+			rotateLeft(parent);
+			parent.color = type.BLACK;
+			RSibling.color = type.BLACK;
+			return;
+		}
+	}
+
+	private void eliminateDoubleBlack(Node currNode) {
+		Node parent = currNode.parent;
+		Node child = (currNode.left != null) ? currNode.left : currNode.right;
+		if (child != null && (currNode.color == type.RED || child.color == type.RED)) {
+			child.color = type.BLACK;
+		} else if (parent != null) {
+			Node sibling = (parent.data > currNode.data) ? parent.right : parent.left;
+			if (sibling != null) {
+				if (sibling.color == type.BLACK && ((sibling.right != null && sibling.right.color == type.RED)
+						|| (sibling.left != null && sibling.left.color == type.RED))) {
+					Node gp = parent.parent;
+					// set sibling color to red to force break of red property
+					// and
+					// can make use of the rebalance method
+					sibling.color = type.RED;
+					if (sibling.left != null) {
+						assignParents(gp, rebalance(parent, sibling.left.data));
+					} else {
+						assignParents(gp, rebalance(parent, sibling.right.data));
+					}
+				} else if (sibling.color == type.BLACK) {
+					if (parent.color == type.BLACK) {
+						parent = recolor(parent);
+						eliminateDoubleBlack(parent);
+					} else {
+						parent = recolor(parent);
+					}
+				} else if(sibling.color == type.RED){
+					if(sibling.data > parent.data){
+						assignParents(parent.parent, rotateLeft(parent));
+					} else {
+						assignParents(parent.parent, rotateRight(parent));
+					}
+				}
+			}
+		}
+	}
+
+	private void assignParents(Node gp, Node rotated) {
+		if (gp == null) {
+			root = rotated;
+		} else if (gp.data < rotated.data) {
+			gp.right = rotated;
+			rotated.parent = gp;
+		} else {
+			gp.left = rotated;
+			rotated.parent = gp;
+		}
+	}
+
+	private Node findMin(Node currNode) {
+		if (currNode.left != null)
+			findMin(currNode.left);
+		return currNode;
+	}
+
+	private void assignParentChild(Node parent, Node currNode, Node child) {
+		if (parent == null) {
+			root = child;
+		} else {
+			if (parent.data > currNode.data) {
+				parent.left = child;
+			} else if (parent.data < currNode.data) {
+				parent.right = child;
+			} else{
+				if(parent.left.data == currNode.data){
+					parent.left = child;
+				} else {
+					parent.right = child;
+				}
+			}
+		}
+		if(child != null)
+			child.parent = parent;
+	}
+
 	public void insert(int data) {
 		root = insert(null, root, data);
 	}
@@ -55,19 +214,19 @@ public class RedBlackTree {
 				if (sibling != null && sibling.color == type.RED) {
 					sibling.color = type.BLACK;
 					parent.color = type.BLACK;
-					if(gp.parent == null)
+					if (gp.parent == null)
 						gp.color = type.BLACK;
 					else
 						gp.color = (gp.color == type.BLACK) ? type.RED : type.BLACK;
 				} else {
-					if(parent.data < gp.data && child.data < parent.data){
+					if (parent.data < gp.data && child.data < parent.data) {
 						return recolor(rotateRight(gp));
-					} else if(parent.data > gp.data && child.data > parent.data){
+					} else if (parent.data > gp.data && child.data > parent.data) {
 						return recolor(rotateLeft(gp));
-					} else if(parent.data < gp.data && child.data > parent.data){
+					} else if (parent.data < gp.data && child.data > parent.data) {
 						gp.left = rotateLeft(parent);
 						return recolor(rotateRight(gp));
-					} else if(parent.data > gp.data && child.data < parent.data){
+					} else if (parent.data > gp.data && child.data < parent.data) {
 						gp.right = rotateRight(parent);
 						return recolor(rotateLeft(gp));
 					}
@@ -80,9 +239,9 @@ public class RedBlackTree {
 
 	private Node recolor(Node parent) {
 		parent.color = type.BLACK;
-		if(parent.left != null)
+		if (parent.left != null)
 			parent.left.color = type.RED;
-		if(parent.right != null)
+		if (parent.right != null)
 			parent.right.color = type.RED;
 		return parent;
 	}
@@ -118,14 +277,14 @@ public class RedBlackTree {
 
 	private Node getSibling(Node currNode) {
 		if (currNode.parent != null)
-			return (currNode.parent.left == currNode) ? currNode.parent.right : currNode.parent.left;
+			return (currNode.parent.data > currNode.data) ? currNode.parent.right : currNode.parent.left;
 		return null;
 	}
 
 	private boolean breaksRedProp(Node currNode, Node leftChild) {
 		return leftChild != null && leftChild.color == type.RED && currNode != null && currNode.color == type.RED;
 	}
-	
+
 	public Node getRoot() {
 		return root;
 	}

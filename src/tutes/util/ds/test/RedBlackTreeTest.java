@@ -7,15 +7,18 @@ import tutes.util.ds.RedBlackTree;
 public class RedBlackTreeTest {
 
 	public static void main(String[] args) {
-		printRandTree();
-//		RedBlackTree tree = new RedBlackTree(1);
-//		tree.insert(10);
-//		tree.insert(11);
-//		tree.insert(4);
-//		tree.insert(5);
-//		tree.insert(2);
-//		tree.traverse();
-//		System.out.println(tree.getRoot());
+//		printRandTree();
+		RedBlackTree tree = new RedBlackTree(1);
+		tree.insert(10);
+		tree.insert(11);
+		tree.insert(4);
+		tree.insert(5);
+		tree.insert(2);
+		tree.traverse();
+		System.out.println(tree.getRoot());
+		tree.delete(10);
+		tree.traverse();
+		System.out.println(tree.getRoot());
 	}
 
 	private static void printRandTree() {

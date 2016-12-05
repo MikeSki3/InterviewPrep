@@ -6,6 +6,10 @@ public class AVLTree {
 	public AVLTree(int initData) {
 		root = new Node(initData);
 	}
+	
+	public Node getRoot(){
+		return root;
+	}
 
 	public void traverse() {
 		traverse(root);
