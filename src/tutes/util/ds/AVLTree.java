@@ -6,8 +6,8 @@ public class AVLTree {
 	public AVLTree(int initData) {
 		root = new Node(initData);
 	}
-	
-	public Node getRoot(){
+
+	public Node getRoot() {
 		return root;
 	}
 
@@ -24,6 +24,84 @@ public class AVLTree {
 		if (currNode.right != null) {
 			traverse(currNode.right);
 		}
+	}
+
+	public void delete(int data) {
+		root = delete(root, data);
+	}
+
+	private Node delete(Node curr, int data) {
+		if (curr == null)
+			return curr;
+		if (curr.data == data) {
+			curr = deleteNode(curr);
+		} else if (curr.data > data) {
+			curr.left = delete(curr.left, data);
+		} else {
+			curr.right = delete(curr.right, data);
+		}
+		if(curr != null)
+			curr.height = getNewHeight(curr);
+		Node child = getLargerHeightChild(curr);
+		Node grandChild = getLargerHeightChild(child);
+		if (child != null && grandChild != null) {
+			curr = rebalance(curr, grandChild.data);
+		}
+		return curr;
+	}
+
+	private Node getLargerHeightChild(Node curr) {
+		if (curr == null)
+			return null;
+		if (curr.left != null && curr.right != null)
+			return (curr.left.height > curr.right.height) ? curr.left : curr.right;
+		else if (curr.left != null)
+			return curr.left;
+		else
+			return curr.right;
+	}
+
+	private Node deleteNode(Node curr) {
+		if (curr == null) {
+			throw new IllegalArgumentException("Cannot delete a null node");
+		} else {
+			if (curr.left != null && curr.right != null) {
+				Node min = findMin(curr.right);
+				curr.data = min.data;
+				curr.right = delete(curr.right, min.data);
+			} else if (curr.left != null)
+				curr = moveNodeUp(curr, curr.left);
+			else if (curr.right != null)
+				curr = moveNodeUp(curr, curr.right);
+			else
+				curr = null;
+			return curr;
+		}
+
+	}
+
+	private Node moveNodeUp(Node curr, Node child) {
+		curr.data = child.data;
+		curr.left = child.left;
+		curr.right = child.right;
+		return curr;
+	}
+
+	private Node findMin(Node curr) {
+		if (curr.left != null)
+			return findMin(curr.left);
+		return curr;
+	}
+
+	private Node find(Node curr, int data) {
+		if (curr == null)
+			return null;
+		if (curr.data == data)
+			return curr;
+		else if (curr.data > data)
+			return find(curr.left, data);
+		else
+			return find(curr.right, data);
 	}
 
 	public void insert(int data) {
@@ -85,6 +163,11 @@ public class AVLTree {
 		oldRoot.height = getNewHeight(oldRoot);
 		newRoot.height = getNewHeight(newRoot);
 		return newRoot;
+	}
+
+	private int getMaxHeight(Node currNode) {
+		return Math.max(((currNode.left == null) ? 1 : currNode.left.height),
+				((currNode.right == null) ? 1 : currNode.right.height));
 	}
 
 	private int getNewHeight(Node currNode) {
