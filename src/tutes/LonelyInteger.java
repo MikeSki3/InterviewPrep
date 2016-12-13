@@ -31,6 +31,7 @@ public class LonelyInteger {
         System.out.println(lonelyInt);
 	}
 	
+	//Better way to solve this, xoring with each integer, obvi better runtime than obove
 	public static int lonelyInteger(int[] a) {
 	    int value = 0;
 
