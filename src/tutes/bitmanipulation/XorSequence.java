@@ -15,7 +15,7 @@ public class XorSequence {
 	}
 
 	private static long xOrGroup(long l, long r) {
-		long groupDiff = (r - (r % 4)) - (l + (l % 4)); 
+		long groupDiff = (r - (r % 4)) - (l + (4 - (l % 4))); 
 		if (groupDiff >= 8 && groupDiff % 8 == 0) {
 			return xOrGroup(l, ((4 - (l % 4)) + l) - 1) ^ xOrGroup(r - (r % 4), r);
 		} else if(groupDiff >= 8){
