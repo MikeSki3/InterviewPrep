@@ -8,7 +8,7 @@ public class LinkedList<E> {
 	public LinkedList(E data){
 		head = new LinkedListNode<>(data);
 		tail = head;
-		size = 0;
+		size = 1;
 	}
 	
 	public LinkedListNode<E> getHead(){
@@ -25,4 +25,18 @@ public class LinkedList<E> {
 	public int size(){
 		return size;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		LinkedListNode<E> temp = head;
+		while(temp != null){
+			sb.append(temp.getValue());
+			sb.append(" ");
+			temp = temp.getNext();
+		}
+		return sb.toString();
+	}
+	
+	
 }
