@@ -8,8 +8,22 @@ public class LinkedListNode<E> {
 		this.data = data;
 	}
 	
-	public void setNext(LinkedListNode<E> next){
+	public LinkedListNode<E> setNext(LinkedListNode<E> next){
+		LinkedListNode<E> temp = this.next;
 		this.next = next;
+		if(next == null){
+			return null;
+		}
+		if(next.getNext() == null) {
+			return next;
+		} else {
+//			int count = 0;
+			while(next.getNext() != null){
+				next = next.getNext();
+//				count++;
+			}
+			return (temp == null) ? next : next.setNext(temp);
+		}
 	}
 	
 	public LinkedListNode<E> getNext(){

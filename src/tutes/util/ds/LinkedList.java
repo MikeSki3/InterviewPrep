@@ -17,12 +17,37 @@ public class LinkedList<E> {
 	
 	public void add(E data){
 		LinkedListNode<E> temp = new LinkedListNode<>(data);
-		tail.setNext(temp);
-		tail = temp;
-		size++;
+		tail = tail.setNext(temp);
 	}
 	
+	//Eff this stuff
+//	public void insert(LinkedListNode<E> node, int index){
+//		if(index == size){
+//			add(node);
+//		} else if(index > size) {
+//			throw new IndexOutOfBoundsException();
+//		} else {
+//			LinkedListNode<E> curr = head;
+//			index--;
+//			while(index > 0){
+//				curr = curr.getNext();
+//				index--;
+//			}
+//			size += curr.setNext(node);
+//		}
+//	}
+	
+	public void add(LinkedListNode<E> node) {
+		tail = tail.setNext(node);
+	}
+
 	public int size(){
+		int size = 0;
+		LinkedListNode<E> curr = this.head;
+		while(curr != null){
+			size++;
+			curr = curr.getNext();
+		}
 		return size;
 	}
 
