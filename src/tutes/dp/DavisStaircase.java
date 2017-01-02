@@ -1,4 +1,4 @@
-package tutes;
+package tutes.dp;
 
 import java.util.HashMap;
 import java.util.Scanner;
