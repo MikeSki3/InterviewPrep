@@ -3,6 +3,7 @@ package ctci.sortingandsearching;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+//THIS IS BROKEN AND DOES NOT WORK
 public class RadixSort {
 	private static int max;
 
