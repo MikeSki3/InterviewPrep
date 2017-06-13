@@ -11,13 +11,34 @@ public class LinkedList<E> {
 		size = 1;
 	}
 	
+	public LinkedList (LinkedListNode<E> head){
+		this.head = head;
+		this.tail = head;
+		this.size = 0;
+		while(this.tail.getNext() != null){
+			this.tail = this.tail.getNext();
+			this.size++;
+		}
+	}
+	
+	public LinkedList() {
+		head = null;
+		tail = null;
+		size = 0;
+	}
+	
 	public LinkedListNode<E> getHead(){
 		return head;
 	}
 	
 	public void add(E data){
 		LinkedListNode<E> temp = new LinkedListNode<>(data);
-		tail = tail.setNext(temp);
+		if(head == null && tail == null){
+			head = temp;
+			tail = temp;
+		} else {
+			tail = tail.insert(temp);
+		}
 	}
 	
 	//Eff this stuff
@@ -38,7 +59,8 @@ public class LinkedList<E> {
 //	}
 	
 	public void add(LinkedListNode<E> node) {
-		tail = tail.setNext(node);
+		tail.setNext(node);
+		tail = node;
 	}
 
 	public int size(){
@@ -57,7 +79,7 @@ public class LinkedList<E> {
 		LinkedListNode<E> temp = head;
 		while(temp != null){
 			sb.append(temp.getValue());
-			sb.append(" ");
+			sb.append(" -> ");
 			temp = temp.getNext();
 		}
 		return sb.toString();

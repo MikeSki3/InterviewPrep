@@ -8,7 +8,8 @@ public class LinkedListNode<E> {
 		this.data = data;
 	}
 	
-	public LinkedListNode<E> setNext(LinkedListNode<E> next){
+	//sorta messed up, was setNext before
+	public LinkedListNode<E> insert(LinkedListNode<E> next){
 		LinkedListNode<E> temp = this.next;
 		this.next = next;
 		if(next == null){
@@ -22,8 +23,12 @@ public class LinkedListNode<E> {
 				next = next.getNext();
 //				count++;
 			}
-			return (temp == null) ? next : next.setNext(temp);
+			return (temp == null) ? next : next.insert(temp);
 		}
+	}
+	
+	public void setNext(LinkedListNode<E> next){
+		this.next = next;
 	}
 	
 	public LinkedListNode<E> getNext(){
@@ -32,7 +37,7 @@ public class LinkedListNode<E> {
 	
 	@Override
 	public String toString() {
-		return "LinkedListNode [data=" + data + ", next=" + next + "]";
+		return data + " -> " + next;
 	}
 
 	public E getValue(){
